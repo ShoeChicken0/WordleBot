@@ -27,33 +27,51 @@ print(guess)
 guess_param = {
     "guess": guess,
     "excluded_letters": "",
-    "correct_letters": "",
+    "correct_letters": [],
     "correct_positions": [0,0,0,0,0]
 }
 
+# regex for letters that must be included
+def correct_expression(guess_param):
+    correct_regex = ""
+    for correct_letter in guess_param["correct_letters"]:
+        correct_regex += f"(?=.*{correct_letter})"
+    return correct_regex
+        
 
+# filter the list of words based on regex pattern from guess param
 def generate_list(guess_param, word_list):
-    search_expression = f"^[^{guess_param['excluded_letters']}]{{5}}$"
+    include_letters = correct_expression(guess_param)
+    search_expression = f"{include_letters}^[^{guess_param['excluded_letters']}]{{5}}$"
+    print(search_expression)
     pattern = re.compile(search_expression)
     matching_words = [word for word in word_list if pattern.match(word)]
+
     print(len(matching_words))
     return matching_words
 
-
+# update the guess parameters based on feedback
 def update_parameters(guess_param, feedback):
     for index, result in enumerate(feedback):
         letter = guess_param["guess"][index]
+
         if result == "2":
             print("Correct letter and position")
             guess_param["correct_positions"][index] = letter
+            # if the letter is both correct and position remove from correct letter and move to position
+            if letter in guess_param["correct_letters"]:
+                guess_param["correct_letters"].remove(letter)
+
         elif result == "1":
             print("Correct letter but wrong position")
-            if letter not in guess_param["correct_letters"]:
-                guess_param["correct_letters"] += letter
+            if letter not in guess_param["correct_letters"] and letter not in guess_param["correct_positions"]:
+                guess_param["correct_letters"].append(letter)
+
         else:
             print("Wrong letter")
             if letter not in guess_param["excluded_letters"]:
                 guess_param["excluded_letters"] += letter
+
     print(guess_param)
 
 
