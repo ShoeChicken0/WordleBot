@@ -1,12 +1,22 @@
 import re
 import random
 import configparser
+import csv
 
 # Function to read words from a text file into a list
 def read_file(file_path):
     with open(file_path, 'r') as file:
         words = [line.strip() for line in file.readlines()]
     return words
+
+# Function to read words from a CSV file into a list
+def read_csv(file_path):
+    words_list = []
+    with open(file_path, mode='r', newline='') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            words_list.append(row[0])
+    return words_list
 
 
 # regex for letters that must be included
@@ -50,7 +60,7 @@ def generate_list(guess_param, word_list):
 # update the guess parameters based on feedback
 def update_parameters(guess_param, feedback):
     for index, result in enumerate(feedback):
-        letter = guess_param["guess"][index]
+        letter = guess_param["guess"][-1][index]
 
         if result == "2":
             print("Correct letter and position")
@@ -73,15 +83,15 @@ def update_parameters(guess_param, feedback):
 config = configparser.ConfigParser()
 config.read('config.ini')
 file_path = config['DEFAULT']['LIST_FILE_PATH']
-word_list = read_file(file_path)
+word_list = read_csv(file_path)
 dictionary_size = len(word_list)
-print(f"valid word list: {dictionary_size}")
+print(f"wordle list: {dictionary_size}")
 random_index = random.randint(0, dictionary_size - 1)
 guess = word_list[random_index]
 print(guess)
 
 guess_param = {
-    "guess": guess,
+    "guess":[guess],
     "excluded_letters": "",
     "correct_letters": [],
     "wrong_position" : ["", "", "", "", ""],
@@ -97,13 +107,10 @@ while feedback != 22222:
     update_parameters(guess_param, feedback)
     word_list = generate_list(guess_param, word_list)
     random_index = random.randint(0, len(word_list) - 1)
-    guess = word_list[random_index]
-    guess_param["guess"] = guess
+    while True:
+        guess = word_list[random_index]
+        if guess not in guess_param["guess"]:
+            guess_param["guess"].append(guess)
+            break
     print(guess)
 print("Game Won!")
-
-
-
-
-
-
