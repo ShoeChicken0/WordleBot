@@ -40,8 +40,9 @@ def generate_list(guess_param, word_list):
     exclude_letters = guess_param["excluded_letters"]
     correct_letters = ""
     search_expression = f"{include_letters}"
-    # counters for consecutive letter inclusion/exclusion (counter1) and correct position (counter2)
+    # counters for consecutive correct letters
     counter2 = 0
+    # index of the first correct letter
     position2 = 0
 
     for index, position in enumerate(guess_param["correct_positions"]):
@@ -68,7 +69,7 @@ def generate_list(guess_param, word_list):
             if index == 4:
                 for i in range(counter2):
                     correct_letters += guess_param["correct_positions"][position2+i]
-                    search_expression += f"{correct_letters}"
+                search_expression += f"{correct_letters}"
     search_expression += "$"
 
     #search_expression = f"{include_letters}^[^{guess_param['excluded_letters']}]{{5}}$"
