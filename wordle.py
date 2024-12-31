@@ -87,16 +87,67 @@ word_list = read_csv(file_path)
 dictionary_size = len(word_list)
 print(f"wordle list: {dictionary_size}")
 random_index = random.randint(0, dictionary_size - 1)
-guess = word_list[random_index]
-print(guess)
 
-guess_param = {
-    "guess":[guess],
-    "excluded_letters": "",
-    "correct_letters": [],
-    "wrong_position" : ["", "", "", "", ""],
-    "correct_positions": ["0","0","0","0","0"]
-}
+helper = True
+guesses = ["First", "Second", "Third", "Fourth"]
+promp_counter = 0
+guess_buffer = ""
+first_guess = True
+
+guess_param = {}
+
+
+while helper:
+    if promp_counter != 4:
+        print("Enter current guesses. Input end when finished to get help")
+        guess_buffer = input(f"{guesses[promp_counter]} guess: ")
+        promp_counter += 1
+        if guess_buffer == "end":
+            random_index = random.randint(0, len(word_list) - 1)
+            guess = word_list[random_index]
+            print(f"Helper start: {guess}")
+            helper = False
+            if first_guess:
+                guess_param = {
+                    "guess":[guess],
+                    "excluded_letters": "",
+                    "correct_letters": [],
+                    "wrong_position" : ["", "", "", "", ""],
+                    "correct_positions": ["0","0","0","0","0"]
+                }
+                first_guess = False
+        else:
+            guess = guess_buffer
+            if first_guess:
+                guess_param = {
+                    "guess":[guess],
+                    "excluded_letters": "",
+                    "correct_letters": [],
+                    "wrong_position" : ["", "", "", "", ""],
+                    "correct_positions": ["0","0","0","0","0"]
+                }
+                print("First guess")
+                first_guess = False
+            print("Input 2 for correct letter and position, 1 for correct letter and wrong position, 0 for wrong letter: ")
+            feedback = input(": ")
+            update_parameters(guess_param, feedback)
+            print(f"guess_param {guess_param}")
+            word_list = generate_list(guess_param, word_list)
+            print(f"wordle list input: {len(word_list)}")
+    else:
+        helper = False
+
+
+# guess = word_list[random_index]
+# print(guess)
+
+# guess_param = {
+#     "guess":[guess],
+#     "excluded_letters": "",
+#     "correct_letters": [],
+#     "wrong_position" : ["", "", "", "", ""],
+#     "correct_positions": ["0","0","0","0","0"]
+# }
 
 feedback = 00000
 while feedback != 22222:
